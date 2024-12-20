@@ -1,0 +1,12 @@
+name: "Renpy Text Linter"
+description: "Проверяет орфографию в указанных файлах с помощью кастомного скрипта"
+inputs:
+  files:
+    description: "Список файлов для проверки, разделённых пробелами"
+    required: true
+    type: string
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  args:
+    - ${{ inputs.files }}
