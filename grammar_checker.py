@@ -10,7 +10,10 @@ class GrammarChecker:
             "Content-Type": "application/x-www-form-urlencoded"
         }
 
-    def check_text(self, text: str, lang: str, options: int) -> List[WordError]:
+    def check_text(self,
+                   text: str,
+                   lang: str,
+                   options: int) -> List[WordError]:
         data = {
             "text": text,
             "lang": lang,

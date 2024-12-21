@@ -5,8 +5,14 @@ inputs:
     description: "Список файлов для проверки, разделённых пробелами"
     required: true
     type: string
+  exclusions:
+    description: "Путь к файлу исключений"
+    required: false
+    type: string
 runs:
   using: "docker"
   image: "Dockerfile"
   args:
     - ${{ inputs.files }}
+    - --exclusions
+    - ${{ inputs.exclusions}}
