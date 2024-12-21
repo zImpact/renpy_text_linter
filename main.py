@@ -1,5 +1,4 @@
 import argparse
-import os
 import constants
 from extract import extract_text
 from batch import create_batches
@@ -55,7 +54,9 @@ def main():
 
     grammar_checker = GrammarChecker(api_url=constants.API_URL)
 
-    for filename in args.files:
+    files = args.files[0].split(" ")
+
+    for filename in files:
         process_file(filename, grammar_checker)
 
 
