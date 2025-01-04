@@ -1,9 +1,9 @@
 import requests
 from typing import List
-from models import WordError
+from models import Error
 
 
-class GrammarChecker:
+class YaSpellerChecker:
     def __init__(self, api_url):
         self.api_url = api_url
         self.headers = {
@@ -13,7 +13,7 @@ class GrammarChecker:
     def check_text(self,
                    text: str,
                    lang: str,
-                   options: int) -> List[WordError]:
+                   options: int) -> List[Error]:
         data = {
             "text": text,
             "lang": lang,
@@ -30,7 +30,7 @@ class GrammarChecker:
             return []
 
         errors = [
-            WordError(
+            Error(
                 code=error.get("code", 0),
                 row=error.get("row", 0),
                 word=error.get("word", ""),

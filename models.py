@@ -3,7 +3,7 @@ from typing import List
 
 
 @dataclass
-class WordError:
+class Error:
     code: int
     row: int
     word: str

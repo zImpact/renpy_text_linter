@@ -16,7 +16,9 @@ def extract_text(filename: str,
                  command_exclusions: List[str]) -> Tuple[List[str], List[int]]:
     quoted_texts = []
     line_positions = []
+
     pattern = re.compile(r'"([^"]+)"')
+    text_pattern = re.compile(r'\{[^}]+\}')
 
     with open(filename, "r", encoding="utf-8") as f:
         for i, line in enumerate(f, start=1):
@@ -24,12 +26,15 @@ def extract_text(filename: str,
             if not line:
                 continue
 
-            if any(line.startswith(command) for command in command_exclusions):
+            if any(line.startswith(command) for command in command_exclusions) or line.endswith("nolint"):
                 continue
 
             matches = pattern.findall(line)
             for match in matches:
-                quoted_texts.append(match)
-                line_positions.append(i)
+                text = text_pattern.sub("", match).strip()
+
+                if re.search(r"[А-Яа-яЁё]", text):
+                    quoted_texts.append(text)
+                    line_positions.append(i)
 
     return quoted_texts, line_positions
