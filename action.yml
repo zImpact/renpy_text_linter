@@ -9,6 +9,10 @@ inputs:
     description: "Путь к файлу исключений"
     required: false
     type: string
+  output-type:
+    description: "Формат вывода"
+    required: false
+    type: string
 runs:
   using: "docker"
   image: "Dockerfile"
@@ -16,3 +20,5 @@ runs:
     - ${{ inputs.files }}
     - --exclusions
     - ${{ inputs.exclusions}}
+    - --output-type
+    - ${{ inputs.output-type }}
