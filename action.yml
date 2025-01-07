@@ -9,7 +9,7 @@ inputs:
     description: "Путь к файлу исключений"
     required: false
     type: string
-  output-type:
+  output_type:
     description: "Формат вывода"
     required: false
     type: string
@@ -21,4 +21,4 @@ runs:
     - --exclusions
     - ${{ inputs.exclusions}}
     - --output-type
-    - ${{ inputs.output-type }}
+    - ${{ inputs.output_type }}
