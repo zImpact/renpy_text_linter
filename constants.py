@@ -6,3 +6,7 @@ ANSI_COLORS = {
 }
 
 API_URL = "https://speller.yandex.net/services/spellservice.json/checkText"
+
+YASPELLER_CHECKER = "YaSpeller"
+LANGUAGE_TOOL_CHECKER = "LanguageTool"
+FORMATTING_CHECKER = "FormattingChecker"

@@ -1,3 +1,4 @@
+import constants
 import requests
 from typing import List
 from models import Error
@@ -31,12 +32,13 @@ class YaSpellerChecker:
 
         errors = [
             Error(
-                code=error.get("code", 0),
+                checker=constants.YASPELLER_CHECKER,
                 row=error.get("row", 0),
                 word=error.get("word", ""),
                 col=error.get("col", 0),
                 length=error.get("len", 0),
-                s=error.get("s", [])
+                message="Орфографическая ошибка",
+                suggestions=error.get("s", [])
             )
             for error in errors_json
         ]

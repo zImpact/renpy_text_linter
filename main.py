@@ -4,13 +4,15 @@ from extract import extract_text, load_exclusions
 from batch import create_batches
 from yaspeller_checker import YaSpellerChecker
 from language_tool_checker import LanguageToolChecker
+from formatting_checker import FormattingChecker
 from highlight import highlight_text
-from typing import Any, Dict, List
+from typing import List
 
 
 def process_file(filename: str,
                  yaspeller_checker: YaSpellerChecker,
                  language_tool_checker: LanguageToolChecker,
+                 formatting_checker: FormattingChecker,
                  command_exclusions: List[str],
                  word_exclusions: List[str]):
     quoted_texts, line_positions = extract_text(filename, command_exclusions)
@@ -27,55 +29,25 @@ def process_file(filename: str,
         ys_errors = yaspeller_checker.check_text(
             batch_text, lang="ru", options=0)
         lt_errors = language_tool_checker.check_text(batch_text)
+        fmt_errors = formatting_checker.check_text(batch_text)
 
-        if not ys_errors and not lt_errors:
+        ys_errors = [e for e in ys_errors if e.word not in word_exclusions]
+        lt_errors = [e for e in lt_errors if e.word not in word_exclusions]
+
+        combined_errors = ys_errors + lt_errors + fmt_errors
+
+        if not combined_errors:
             print(f"Батч {batch_num}: ошибок не найдено.")
             continue
 
-        combined_errors: List[Dict[str, Any]] = []
-
-        for ys_error in ys_errors:
-            if ys_error.word in word_exclusions:
-                continue
-
-            combined_errors.append({
-                "checker": "YaSpeller",
-                "row": ys_error.row,
-                "col": ys_error.col,
-                "length": ys_error.length,
-                "text": ys_error.word,
-                "message": "Орфографическая ошибка",
-                "suggestions": ys_error.s
-            })
-
-        for lt_error in lt_errors:
-            offset = lt_error.offset
-            length = lt_error.errorLength
-            row, col = language_tool_checker.offset_to_row_col(
-                batch_texts, offset)
-
-            fragment = batch_texts[row][col: col + length]
-            if fragment in word_exclusions:
-                continue
-
-            combined_errors.append({
-                "checker": "LanguageTool",
-                "row": row,
-                "col": col,
-                "length": length,
-                "text": fragment,
-                "message": lt_error.message,
-                "suggestions": lt_error.replacements
-            })
-
-        combined_errors.sort(key=lambda e: (e["row"], e["col"]))
+        combined_errors.sort(key=lambda e: (e.row, e.col))
 
         for error in combined_errors:
-            row = error["row"]
-            col = error["col"]
-            length = error["length"]
-            message = error["message"]
-            checker = error["checker"]
+            row = error.row
+            col = error.col
+            length = error.length
+            message = error.message
+            checker = error.checker
 
             original_text = batch_texts[row]
             original_line_number = batch_lines[row]
@@ -89,8 +61,8 @@ def process_file(filename: str,
                 summary, 0, len(summary), "yellow")
             print(summary_highlighted)
 
-            if error["suggestions"]:
-                fixes = ", ".join(error["suggestions"])
+            if error.suggestions:
+                fixes = ", ".join(error.suggestions)
                 fixes_highlighted = highlight_text(
                     fixes, 0, len(fixes), "green")
                 print(f"Варианты исправления: {fixes_highlighted}")
@@ -115,6 +87,7 @@ def main():
 
     yaspeller_checker = YaSpellerChecker(api_url=constants.API_URL)
     language_tool_checker = LanguageToolChecker()
+    formatting_checker = FormattingChecker()
 
     if args.exclusions:
         command_exclusions, word_exclusions = load_exclusions(args.exclusions)
@@ -125,7 +98,10 @@ def main():
     files = args.files[0].split(" ")
 
     for filename in files:
-        process_file(filename, yaspeller_checker, language_tool_checker,
+        process_file(filename,
+                     yaspeller_checker,
+                     language_tool_checker,
+                     formatting_checker,
                      command_exclusions, word_exclusions)
 
 

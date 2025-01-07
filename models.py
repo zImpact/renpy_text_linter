@@ -4,9 +4,10 @@ from typing import List
 
 @dataclass
 class Error:
-    code: int
+    checker: str
     row: int
     word: str
     col: int
     length: int
-    s: List[str]
+    message: str
+    suggestions: List[str]
