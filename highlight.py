@@ -1,7 +1,10 @@
 import constants
 
 
-def highlight_text(line_from_file: str, col: int, length: int, color: str) -> str:
+def highlight_text(line_from_file: str,
+                   col: int,
+                   length: int,
+                   color: str) -> str:
     if col < 0 or col + length > len(line_from_file):
         return line_from_file
 

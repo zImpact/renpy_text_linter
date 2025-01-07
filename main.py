@@ -1,3 +1,4 @@
+import os
 import argparse
 import constants
 from extract import extract_text, load_exclusions
@@ -5,7 +6,9 @@ from batch import create_batches
 from yaspeller_checker import YaSpellerChecker
 from language_tool_checker import LanguageToolChecker
 from formatting_checker import FormattingChecker
-from highlight import highlight_text
+from outputs.base_output import BaseOutput
+from outputs.console_output import ConsoleOutput
+from outputs.markdown_output import MarkdownOutput
 from typing import List
 
 
@@ -13,15 +16,15 @@ def process_file(filename: str,
                  yaspeller_checker: YaSpellerChecker,
                  language_tool_checker: LanguageToolChecker,
                  formatting_checker: FormattingChecker,
+                 outputter: BaseOutput,
                  command_exclusions: List[str],
-                 word_exclusions: List[str]):
+                 word_exclusions: List[str]) -> str:
     quoted_texts, line_positions = extract_text(filename, command_exclusions)
     batches = create_batches(quoted_texts, line_positions)
 
-    process_file_info = f"Обработка файла: {filename}"
-    process_file_info_highlighted = highlight_text(
-        process_file_info, 0, len(process_file_info), "blue")
-    print(process_file_info_highlighted)
+    output_buffer = []
+    header = f"Обработка файла: {filename}"
+    output_buffer.append(outputter.output_header(header))
 
     for batch_num, (batch_texts, batch_lines) in enumerate(batches, start=1):
         batch_text = "\n".join(batch_texts)
@@ -37,7 +40,8 @@ def process_file(filename: str,
         combined_errors = ys_errors + lt_errors + fmt_errors
 
         if not combined_errors:
-            print(f"Батч {batch_num}: ошибок не найдено.")
+            output_buffer.append(outputter.output_header(
+                f"Батч {batch_num}: ошибок не найдено."))
             continue
 
         combined_errors.sort(key=lambda e: (e.row, e.col))
@@ -52,21 +56,20 @@ def process_file(filename: str,
             original_text = batch_texts[row]
             original_line_number = batch_lines[row]
 
-            highlighted_line = highlight_text(
-                original_text, col, length, "red")
-            print(highlighted_line)
+            output_buffer.append(outputter.output_info(
+                original_text, col, length))
 
             summary = f"[{checker}]: ошибка в строке {original_line_number} - {message.lower()}"
-            summary_highlighted = highlight_text(
-                summary, 0, len(summary), "yellow")
-            print(summary_highlighted)
+            output_buffer.append(outputter.output_error(summary))
 
             if error.suggestions:
                 fixes = ", ".join(error.suggestions)
-                fixes_highlighted = highlight_text(
-                    fixes, 0, len(fixes), "green")
-                print(f"Варианты исправления: {fixes_highlighted}")
-            print()
+                suggestion = f"Варианты исправления: {fixes}"
+                output_buffer.append(outputter.output_suggestion(suggestion))
+
+            output_buffer.append("")
+
+    return "\n".join(output_buffer)
 
 
 def main():
@@ -83,6 +86,11 @@ def main():
         required=False,
         help="Исключения при проверке"
     )
+    parser.add_argument(
+        "--output-type",
+        choices=["console", "markdown"],
+        default="console"
+    )
     args = parser.parse_args()
 
     yaspeller_checker = YaSpellerChecker(api_url=constants.API_URL)
@@ -95,14 +103,39 @@ def main():
     else:
         command_exclusions, word_exclusions = [], []
 
+    if args.output_type == "console":
+        outputter = ConsoleOutput()
+
+    elif args.output_type == "markdown":
+        outputter = MarkdownOutput()
+
     files = args.files[0].split(" ")
 
+    all_output = []
     for filename in files:
-        process_file(filename,
-                     yaspeller_checker,
-                     language_tool_checker,
-                     formatting_checker,
-                     command_exclusions, word_exclusions)
+        result = process_file(
+            filename,
+            yaspeller_checker,
+            language_tool_checker,
+            formatting_checker,
+            outputter,
+            command_exclusions, word_exclusions
+        )
+        all_output.append(result)
+
+    final_report = "\n".join(all_output)
+
+    if args.output_type == "console":
+        print(final_report)
+
+    elif args.output_type == "markdown":
+        summary_file = os.environ.get("GITHUB_STEP_SUMMARY")
+        if summary_file:
+            with open(summary_file, "a", encoding="utf-8") as f:
+                f.write(final_report + "\n")
+        else:
+            with open("report.md", "w", encoding="utf-8") as f:
+                f.write(final_report + "\n")
 
 
 if __name__ == "__main__":
