@@ -13,3 +13,6 @@ class BaseOutput(Protocol):
 
     def output_suggestion(self, text: str) -> str:
         raise NotImplementedError
+
+    def output_newline(self) -> str:
+        raise NotImplementedError

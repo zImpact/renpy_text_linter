@@ -10,14 +10,19 @@ class MarkdownOutput(BaseOutput):
         highlight = text[col:col+length]
         after = text[col+length:]
 
-        return f"🔴 {before}**~~{highlight}~~**{after}<br />"
+        content = "_" * \
+            len(highlight) if highlight.strip() == "" else highlight
+        return f"🔴 {before}<strong>{content}</strong>{after}<br />"
 
     def output_error(self, text: str) -> str:
-        return f"🟡 ***{text}***<br />"
+        return f"🟡 <strong><em>{text}</em></strong><br />"
 
     def output_suggestion(self, text: str) -> str:
         fixes_len = len("Варианты исправления:")
 
         before = text[:fixes_len]
-        suggestion_part = text[fixes_len:]
-        return f"🟢 {before}**{suggestion_part}**<br />"
+        suggestion_part = text[fixes_len + 1:]
+        return f"🟢 {before} <strong>{suggestion_part}</strong><br />"
+
+    def output_newline(self) -> str:
+        return "<hr>"

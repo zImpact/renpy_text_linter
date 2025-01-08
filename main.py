@@ -23,8 +23,8 @@ def process_file(filename: str,
     batches = create_batches(quoted_texts, line_positions)
 
     output_buffer = []
-    header = f"Обработка файла: {filename}"
-    output_buffer.append(outputter.output_header(header))
+    output_buffer.append(outputter.output_header(
+        f"Обработка файла: {filename}"))
 
     for batch_num, (batch_texts, batch_lines) in enumerate(batches, start=1):
         batch_text = "\n".join(batch_texts)
@@ -67,7 +67,7 @@ def process_file(filename: str,
                 suggestion = f"Варианты исправления: {fixes}"
                 output_buffer.append(outputter.output_suggestion(suggestion))
 
-            output_buffer.append("")
+            output_buffer.append(outputter.output_newline())
 
     return "\n".join(output_buffer)
 

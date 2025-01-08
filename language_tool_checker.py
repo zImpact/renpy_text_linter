@@ -28,7 +28,7 @@ class LanguageToolChecker:
                 word=fragment,
                 col=col,
                 length=length,
-                suggestions=match.replacements,
+                suggestions=match.replacements if match.ruleId != "WHITESPACE_RULE" else [],
                 message=match.message,
             )
             errors.append(error)

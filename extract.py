@@ -26,7 +26,8 @@ def extract_text(filename: str,
             if not line:
                 continue
 
-            if any(line.startswith(command) for command in command_exclusions) or line.endswith("nolint"):
+            if any(line.startswith(command) for command in command_exclusions)\
+                    or line.endswith("nolint"):
                 continue
 
             matches = pattern.findall(line)

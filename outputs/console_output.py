@@ -15,3 +15,6 @@ class ConsoleOutput(BaseOutput):
     def output_suggestion(self, text: str) -> str:
         fixes_len = len("Варианты исправления:")
         return highlight_text(text, fixes_len, len(text) - fixes_len, "green")
+
+    def output_newline(self) -> str:
+        return ""

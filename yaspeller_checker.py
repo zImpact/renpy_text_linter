@@ -5,7 +5,7 @@ from models import Error
 
 
 class YaSpellerChecker:
-    def __init__(self, api_url):
+    def __init__(self, api_url: str):
         self.api_url = api_url
         self.headers = {
             "Content-Type": "application/x-www-form-urlencoded"

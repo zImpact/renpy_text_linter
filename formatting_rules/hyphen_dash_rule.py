@@ -11,8 +11,8 @@ class HyphenDashRule(FormattingRule):
         pattern = re.compile(r"\s-\s")
 
         for match in pattern.finditer(line):
-            start_col = match.start()
-            end_col = match.end()
+            start_col = match.start() + 1
+            end_col = match.end() - 1
             length = end_col - start_col
             suggestion = line.replace("-", "—")
 
