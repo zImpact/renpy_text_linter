@@ -22,13 +22,14 @@ class LanguageToolChecker:
             if 0 <= row < len(lines):
                 fragment = lines[row][col:col + length]
 
+            suggestions = match.replacements if match.ruleId != "WHITESPACE_RULE" else []
             error = Error(
                 checker=constants.LANGUAGE_TOOL_CHECKER,
                 row=row,
                 word=fragment,
                 col=col,
                 length=length,
-                suggestions=match.replacements if match.ruleId != "WHITESPACE_RULE" else [],
+                suggestions=suggestions,
                 message=match.message,
             )
             errors.append(error)

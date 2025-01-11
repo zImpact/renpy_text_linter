@@ -9,6 +9,8 @@ from formatting_checker import FormattingChecker
 from outputs.base_output import BaseOutput
 from outputs.console_output import ConsoleOutput
 from outputs.markdown_output import MarkdownOutput
+from outputs.docx_output import DocxOutput
+from outputs.txt_output import TxtOutput
 from typing import List
 
 
@@ -69,6 +71,9 @@ def process_file(filename: str,
 
             output_buffer.append(outputter.output_newline())
 
+    if type(outputter) is DocxOutput:
+        return str()
+
     return "\n".join(output_buffer)
 
 
@@ -88,12 +93,12 @@ def main():
     )
     parser.add_argument(
         "--output-type",
-        choices=["console", "markdown"],
+        choices=["console", "markdown", "docx", "txt"],
         default="console"
     )
     args = parser.parse_args()
 
-    yaspeller_checker = YaSpellerChecker(api_url=constants.API_URL)
+    yaspeller_checker = YaSpellerChecker(api_url=constants.YASPELLER_API_URL)
     language_tool_checker = LanguageToolChecker()
     formatting_checker = FormattingChecker()
 
@@ -109,6 +114,12 @@ def main():
     elif args.output_type == "markdown":
         outputter = MarkdownOutput()
 
+    elif args.output_type == "docx":
+        outputter = DocxOutput()
+
+    elif args.output_type == "txt":
+        outputter = TxtOutput()
+
     files = args.files[0].split(" ")
 
     all_output = []
@@ -123,7 +134,8 @@ def main():
         )
         all_output.append(result)
 
-    final_report = "\n".join(all_output)
+    if args.output_type != "docx":
+        final_report = "\n".join(all_output)
 
     if args.output_type == "console":
         print(final_report)
@@ -136,6 +148,13 @@ def main():
         else:
             with open("report.md", "w", encoding="utf-8") as f:
                 f.write(final_report + "\n")
+
+    elif args.output_type == "txt":
+        with open("report.txt", "w", encoding="utf-8") as f:
+            f.write(final_report + "\n")
+
+    elif args.output_type == "docx":
+        outputter.save()
 
 
 if __name__ == "__main__":

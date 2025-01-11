@@ -1,3 +1,4 @@
 requests
 pyyaml
 language_tool_python
+python-docx

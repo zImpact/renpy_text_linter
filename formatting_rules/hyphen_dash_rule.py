@@ -14,7 +14,7 @@ class HyphenDashRule(FormattingRule):
             start_col = match.start() + 1
             end_col = match.end() - 1
             length = end_col - start_col
-            suggestion = line.replace("-", "—")
+            suggestion = line[:start_col] + "—" + line[end_col:]
 
             errors.append(Error(
                 row=row_index,
