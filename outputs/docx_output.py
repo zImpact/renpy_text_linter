@@ -12,7 +12,6 @@ class DocxOutput(BaseOutput):
         self.document = Document()
         # TODO: можно передавать имя файла при запуске линтера,
         # тогда нужно filename передавать как параметр
-        self.filename = "report.docx"
 
     def output_header(self, text: str) -> None:
         paragraph = self.document.add_paragraph()
@@ -81,4 +80,5 @@ class DocxOutput(BaseOutput):
         pPr.append(borders)
 
     def save(self) -> None:
+        self.filename = "report.docx"
         self.document.save(self.filename)

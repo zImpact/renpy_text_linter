@@ -1,17 +1,11 @@
-import os
-import argparse
-import constants
-from extract import extract_text, load_exclusions
 from batch import create_batches
 from yaspeller_checker import YaSpellerChecker
 from language_tool_checker import LanguageToolChecker
 from formatting_checker import FormattingChecker
 from outputs.base_output import BaseOutput
-from outputs.console_output import ConsoleOutput
-from outputs.markdown_output import MarkdownOutput
 from outputs.docx_output import DocxOutput
-from outputs.txt_output import TxtOutput
 from typing import List
+from extract import extract_text
 
 
 def process_file(filename: str,
@@ -66,6 +60,9 @@ def process_file(filename: str,
 
             if error.suggestions:
                 fixes = ", ".join(error.suggestions)
+                # TODO: вынести текст "варианты исправления в функцию
+                # output_suggestion, тогда не придется криво резать строку
+                # и склеивать обратно"
                 suggestion = f"Варианты исправления: {fixes}"
                 output_buffer.append(outputter.output_suggestion(suggestion))
 
@@ -75,87 +72,3 @@ def process_file(filename: str,
         return str()
 
     return "\n".join(output_buffer)
-
-
-def main():
-    parser = argparse.ArgumentParser(description="Grammar Checker Action")
-    parser.add_argument(
-        "files",
-        metavar="FILE",
-        type=str,
-        nargs="+",
-        help="Файлы для проверки орфографии"
-    )
-    parser.add_argument(
-        "--exclusions",
-        required=False,
-        help="Исключения при проверке"
-    )
-    parser.add_argument(
-        "--output-type",
-        choices=["console", "markdown", "docx", "txt"],
-        default="console"
-    )
-    args = parser.parse_args()
-
-    yaspeller_checker = YaSpellerChecker(api_url=constants.YASPELLER_API_URL)
-    language_tool_checker = LanguageToolChecker()
-    formatting_checker = FormattingChecker()
-
-    if args.exclusions:
-        command_exclusions, word_exclusions = load_exclusions(args.exclusions)
-
-    else:
-        command_exclusions, word_exclusions = [], []
-
-    if args.output_type == "console":
-        outputter = ConsoleOutput()
-
-    elif args.output_type == "markdown":
-        outputter = MarkdownOutput()
-
-    elif args.output_type == "docx":
-        outputter = DocxOutput()
-
-    elif args.output_type == "txt":
-        outputter = TxtOutput()
-
-    files = args.files[0].split(" ")
-
-    all_output = []
-    for filename in files:
-        result = process_file(
-            filename,
-            yaspeller_checker,
-            language_tool_checker,
-            formatting_checker,
-            outputter,
-            command_exclusions, word_exclusions
-        )
-        all_output.append(result)
-
-    if args.output_type != "docx":
-        final_report = "\n".join(all_output)
-
-    if args.output_type == "console":
-        print(final_report)
-
-    elif args.output_type == "markdown":
-        summary_file = os.environ.get("GITHUB_STEP_SUMMARY")
-        if summary_file:
-            with open(summary_file, "a", encoding="utf-8") as f:
-                f.write(final_report + "\n")
-        else:
-            with open("report.md", "w", encoding="utf-8") as f:
-                f.write(final_report + "\n")
-
-    elif args.output_type == "txt":
-        with open("report.txt", "w", encoding="utf-8") as f:
-            f.write(final_report + "\n")
-
-    elif args.output_type == "docx":
-        outputter.save()
-
-
-if __name__ == "__main__":
-    main()

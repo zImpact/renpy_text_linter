@@ -27,3 +27,9 @@ class TxtOutput(BaseOutput):
 
     def output_newline(self) -> str:
         return f"\n{'=' * 40}\n"
+
+    def save(self, final_report: str) -> None:
+        self.filename = "report.txt"
+
+        with open(self.filename, "w", encoding="utf-8") as f:
+            f.write(final_report + "\n")

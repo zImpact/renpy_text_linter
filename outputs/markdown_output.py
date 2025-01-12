@@ -1,3 +1,4 @@
+import os
 from outputs.base_output import BaseOutput
 
 
@@ -26,3 +27,14 @@ class MarkdownOutput(BaseOutput):
 
     def output_newline(self) -> str:
         return "<hr>"
+
+    def save(self, final_report: str) -> None:
+        summary_file = os.environ.get("GITHUB_STEP_SUMMARY")
+        if summary_file:
+            with open(summary_file, "a", encoding="utf-8") as f:
+                f.write(final_report + "\n")
+        else:
+            self.filename = "report.md"
+
+            with open(self.filename, "w", encoding="utf-8") as f:
+                f.write(final_report + "\n")
