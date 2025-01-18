@@ -19,11 +19,7 @@ class TxtOutput(BaseOutput):
         return f"{text}"
 
     def output_suggestion(self, text: str) -> str:
-        fixes_len = len("Варианты исправления:")
-
-        before = text[:fixes_len]
-        suggestion_part = text[fixes_len + 1:]
-        return f"{before} <{suggestion_part}>"
+        return f"Варианты исправления: <{text}>"
 
     def output_newline(self) -> str:
         return f"\n{'=' * 40}\n"

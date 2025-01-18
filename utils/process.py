@@ -1,11 +1,11 @@
-from batch import create_batches
-from yaspeller_checker import YaSpellerChecker
-from language_tool_checker import LanguageToolChecker
-from formatting_checker import FormattingChecker
+from checkers.yaspeller_checker import YaSpellerChecker
+from checkers.language_tool_checker import LanguageToolChecker
+from checkers.formatting_checker import FormattingChecker
 from outputs.base_output import BaseOutput
 from outputs.docx_output import DocxOutput
+from utils.batch import create_batches
+from utils.extract import extract_text
 from typing import List
-from extract import extract_text
 
 
 def process_file(filename: str,
@@ -26,12 +26,20 @@ def process_file(filename: str,
         batch_text = "\n".join(batch_texts)
 
         ys_errors = yaspeller_checker.check_text(
-            batch_text, lang="ru", options=0)
-        lt_errors = language_tool_checker.check_text(batch_text)
-        fmt_errors = formatting_checker.check_text(batch_text)
+            batch_text,
+            lang="ru",
+            options=0
+        )
+        lt_errors = language_tool_checker.check_text(
+            batch_text
+        )
+        fmt_errors = formatting_checker.check_text(
+            batch_text
+        )
 
-        ys_errors = [e for e in ys_errors if e.word not in word_exclusions]
-        lt_errors = [e for e in lt_errors if e.word not in word_exclusions]
+        if word_exclusions:
+            ys_errors = [e for e in ys_errors if e.word not in word_exclusions]
+            lt_errors = [e for e in lt_errors if e.word not in word_exclusions]
 
         combined_errors = ys_errors + lt_errors + fmt_errors
 
@@ -55,15 +63,11 @@ def process_file(filename: str,
             output_buffer.append(outputter.output_info(
                 original_text, col, length))
 
-            summary = f"[{checker}]: ошибка в строке {original_line_number} - {message.lower()}"
+            summary = f"[{checker}]: ошибка в строке {original_line_number} — {message.lower()}"
             output_buffer.append(outputter.output_error(summary))
 
             if error.suggestions:
-                fixes = ", ".join(error.suggestions)
-                # TODO: вынести текст "варианты исправления в функцию
-                # output_suggestion, тогда не придется криво резать строку
-                # и склеивать обратно"
-                suggestion = f"Варианты исправления: {fixes}"
+                suggestion = ", ".join(error.suggestions)
                 output_buffer.append(outputter.output_suggestion(suggestion))
 
             output_buffer.append(outputter.output_newline())

@@ -1,5 +1,5 @@
 from typing import List
-from models import Error
+from common.models import Error
 
 
 class FormattingRule:

@@ -19,11 +19,7 @@ class MarkdownOutput(BaseOutput):
         return f"🟡 <strong><em>{text}</em></strong><br />"
 
     def output_suggestion(self, text: str) -> str:
-        fixes_len = len("Варианты исправления:")
-
-        before = text[:fixes_len]
-        suggestion_part = text[fixes_len + 1:]
-        return f"🟢 {before} <strong>{suggestion_part}</strong><br />"
+        return f"🟢 Варианты исправления: <strong>{text}</strong><br />"
 
     def output_newline(self) -> str:
         return "<hr>"

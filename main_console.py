@@ -1,10 +1,10 @@
 import argparse
-import constants
-from process import process_file
-from extract import load_exclusions
-from yaspeller_checker import YaSpellerChecker
-from language_tool_checker import LanguageToolChecker
-from formatting_checker import FormattingChecker
+import common.constants as constants
+from utils.process import process_file
+from utils.extract import load_exclusions
+from checkers.yaspeller_checker import YaSpellerChecker
+from checkers.language_tool_checker import LanguageToolChecker
+from checkers.formatting_checker import FormattingChecker
 from outputs.console_output import ConsoleOutput
 from outputs.markdown_output import MarkdownOutput
 from outputs.docx_output import DocxOutput
@@ -27,7 +27,7 @@ def main():
     )
     parser.add_argument(
         "--output-type",
-        choices=constants.CONSOLE_OUTPUT_FORMATS,
+        choices=[output.value for output in constants.CONSOLE_OUTPUT_FORMATS],
         default=constants.OutputType.CONSOLE.value
     )
     args = parser.parse_args()

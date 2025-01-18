@@ -4,7 +4,7 @@ from formatting_rules.space_at_line_start_rule import SpaceAtLineStartRule
 from formatting_rules.single_quotes_rule import SingleQuotesRule
 from formatting_rules.hyphen_dash_rule import HyphenDashRule
 from typing import List
-from models import Error
+from common.models import Error
 
 
 class FormattingChecker:

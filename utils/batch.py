@@ -1,7 +1,9 @@
 from typing import List, Tuple
 
 
-def create_batches(texts: List[str], lines: List[int], max_chars: int = 10000) -> List[Tuple[List[str], List[int]]]:
+def create_batches(texts: List[str],
+                   lines: List[int],
+                   max_chars: int = 10000) -> List[Tuple[List[str], List[int]]]:
     batches = []
     current_batch_texts = []
     current_batch_lines = []

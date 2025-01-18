@@ -6,11 +6,11 @@ from outputs.in_app_output import InAppOutput
 from outputs.markdown_output import MarkdownOutput
 from outputs.docx_output import DocxOutput
 from outputs.txt_output import TxtOutput
-from yaspeller_checker import YaSpellerChecker
-from language_tool_checker import LanguageToolChecker
-from formatting_checker import FormattingChecker
-from process import process_file
-import constants
+from checkers.yaspeller_checker import YaSpellerChecker
+from checkers.language_tool_checker import LanguageToolChecker
+from checkers.formatting_checker import FormattingChecker
+from utils.process import process_file
+import common.constants as constants
 import sys
 
 
@@ -61,7 +61,7 @@ class RenpyTextLinterApp(QMainWindow):
 
     def run_grammar_check(self):
         if not hasattr(self, "file_path") or not self.file_path:
-            self.result_text.setText("Выберите файл для проверки")
+            self.result_text.setHtml("Выберите файл для проверки")
             return
 
         output_type = self.output_type_combobox.currentText()
@@ -91,7 +91,7 @@ class RenpyTextLinterApp(QMainWindow):
             )
 
             if output_type == constants.OutputType.IN_APP.value:
-                self.result_text.setText(result)
+                self.result_text.setHtml(result)
             else:
                 if output_type == constants.OutputType.DOCX.value:
                     outputter.save()
@@ -102,7 +102,7 @@ class RenpyTextLinterApp(QMainWindow):
                     f"Результат сохранён в файле: {outputter.filename}")
 
         except Exception as e:
-            self.result_text.setText(f"Произошла ошибка: {str(e)}")
+            self.result_text.setHtml(f"Произошла ошибка: {str(e)}")
 
 
 if __name__ == "__main__":

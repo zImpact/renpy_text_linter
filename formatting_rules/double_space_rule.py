@@ -1,8 +1,8 @@
 import re
-import constants
+import common.constants as constants
 from formatting_rules.base_rule import FormattingRule
 from typing import List
-from models import Error
+from common.models import Error
 
 
 class DoubleSpaceRule(FormattingRule):

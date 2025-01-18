@@ -1,6 +1,7 @@
-import constants
-from typing import List, Tuple
-from models import Error
+import common.constants as constants
+from typing import List
+from common.models import Error
+from utils.offset_to_row_col import offset_to_row_col
 from language_tool_python import LanguageTool
 
 
@@ -16,7 +17,7 @@ class LanguageToolChecker:
         for match in matches:
             offset = match.offset
             length = match.errorLength
-            row, col = self.offset_to_row_col(lines, offset)
+            row, col = offset_to_row_col(lines, offset)
 
             fragment = ""
             if 0 <= row < len(lines):
@@ -35,17 +36,3 @@ class LanguageToolChecker:
             errors.append(error)
 
         return errors
-
-    @staticmethod
-    def offset_to_row_col(lines: List[str], offset: int) -> Tuple[int, int]:
-        current_offset = 0
-        for row_index, line in enumerate(lines):
-            line_length = len(line) + 1
-
-            if offset < current_offset + line_length:
-                col_index = offset - current_offset
-                return row_index, col_index
-
-            current_offset += line_length
-
-        return -1, -1

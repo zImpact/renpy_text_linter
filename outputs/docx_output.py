@@ -1,4 +1,4 @@
-import constants
+import common.constants as constants
 from docx import Document
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
@@ -48,17 +48,13 @@ class DocxOutput(BaseOutput):
         run.font.color.rgb = RGBColor(255, 128, 0)
 
     def output_suggestion(self, text: str) -> None:
-        fixes_len = len("Варианты исправления:")
-        before = text[:fixes_len]
-        suggestion = text[fixes_len:]
-
         paragraph = self.document.add_paragraph()
 
-        before_run = paragraph.add_run(before)
+        before_run = paragraph.add_run("Варианты исправления: ")
         before_run.font.name = constants.WORD_TIMES_NEW_ROMAN_FONT
         before_run.font.size = Pt(constants.WORD_MAIN_TEXT_SIZE)
 
-        suggestion_run = paragraph.add_run(suggestion)
+        suggestion_run = paragraph.add_run(text)
         suggestion_run.font.name = constants.WORD_TIMES_NEW_ROMAN_FONT
         suggestion_run.font.size = Pt(constants.WORD_MAIN_TEXT_SIZE)
         suggestion_run.font.color.rgb = RGBColor(0, 102, 0)

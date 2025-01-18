@@ -1,7 +1,7 @@
-import constants
+import common.constants as constants
 import requests
 from typing import List
-from models import Error
+from common.models import Error
 
 
 class YaSpellerChecker:
