@@ -32,7 +32,7 @@ def extract_text(filename: str,
 
             matches = pattern.findall(line)
             for match in matches:
-                text = text_pattern.sub("", match).strip()
+                text = text_pattern.sub("", match).replace("\\n", " ").strip()
 
                 if re.search(r"[А-Яа-яЁё]", text):
                     quoted_texts.append(text)
