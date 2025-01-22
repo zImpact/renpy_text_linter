@@ -1,3 +1,4 @@
+import os
 import argparse
 import common.constants as constants
 from utils.process import process_file
@@ -75,7 +76,8 @@ def main():
         else:
             outputter.save(final_report)
 
-        print(f"Результат сохранён в файле: {outputter.filename}")
+        if not os.environ.get("GITHUB_STEP_SUMMARY"):
+            print(f"Результат сохранён в файле: {outputter.filename}")
 
 
 if __name__ == "__main__":
