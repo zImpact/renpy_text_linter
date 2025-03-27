@@ -62,7 +62,11 @@ def process_file(filename: str,
             output_buffer.append(outputter.output_info(
                 original_text, col, length))
 
-            summary = f"[{checker}]: ошибка в строке {original_line_number} — {message.lower()}"
+            summary = (
+                f"[{checker}]: ошибка в строке {original_line_number} — "
+                f"{message.lower()}"
+            )
+
             output_buffer.append(outputter.output_error(summary))
 
             if error.suggestions:
