@@ -3,21 +3,18 @@ import yaml
 from typing import List, Tuple
 
 
-def load_exclusions(exclusions_file_path: str) -> Tuple[List[str], List[str]]:
+def load_exclusions(exclusions_file_path: str) -> List[str]:
     with open(exclusions_file_path, "r", encoding="utf-8") as f:
         exclusions = yaml.safe_load(f)
 
-    commands = exclusions.get("commands", [])
-    words = exclusions.get("words", [])
-    return commands, words
+    return exclusions.get("words", [])
 
 
-def extract_text(filename: str,
-                 command_exclusions: List[str]) -> Tuple[List[str], List[int]]:
+def extract_text(filename: str) -> Tuple[List[str], List[int]]:
     quoted_texts = []
     line_positions = []
 
-    pattern = re.compile(r'"([^"]+)"')
+    pattern = re.compile(r'"((?:\\.|[^"\\])*)"')
     text_pattern = re.compile(r'\{[^}]+\}')
 
     with open(filename, "r", encoding="utf-8") as f:
@@ -26,8 +23,7 @@ def extract_text(filename: str,
             if not line:
                 continue
 
-            if any(line.startswith(command) for command in command_exclusions)\
-                    or line.endswith("nolint"):
+            if line.endswith("nolint"):
                 continue
 
             matches = pattern.findall(line)

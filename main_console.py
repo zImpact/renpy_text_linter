@@ -1,5 +1,6 @@
 import os
 import argparse
+import pathlib
 import common.constants as constants
 from utils.process import process_file
 from utils.extract import load_exclusions
@@ -15,11 +16,11 @@ from outputs.txt_output import TxtOutput
 def main():
     parser = argparse.ArgumentParser(description="Renpy Text Linter")
     parser.add_argument(
-        "files",
-        metavar="FILE",
+        "paths",
+        metavar="PATH",
         type=str,
         nargs="+",
-        help="Файлы для проверки орфографии"
+        help="Файлы или директории для проверки орфографии"
     )
     parser.add_argument(
         "--exclusions",
@@ -37,11 +38,8 @@ def main():
     language_tool_checker = LanguageToolChecker()
     formatting_checker = FormattingChecker()
 
-    if args.exclusions:
-        command_exclusions, word_exclusions = load_exclusions(args.exclusions)
-
-    else:
-        command_exclusions, word_exclusions = [], []
+    word_exclusions = load_exclusions(
+        args.exclusions) if args.exclusions else []
 
     outputter = {
         constants.OutputType.CONSOLE.value: ConsoleOutput(),
@@ -50,7 +48,15 @@ def main():
         constants.OutputType.TXT.value: TxtOutput()
     }.get(args.output_type, ConsoleOutput())
 
-    files = args.files[0].split(" ")
+    files = []
+    for path in args.paths:
+        p = pathlib.Path(path)
+        if p.is_dir():
+            for file in p.rglob("*.rpy"):
+                files.append(str(file))
+
+        else:
+            files.append(str(p))
 
     all_output = []
     for filename in files:
@@ -60,7 +66,7 @@ def main():
             language_tool_checker,
             formatting_checker,
             outputter,
-            command_exclusions, word_exclusions
+            word_exclusions
         )
         all_output.append(result)
 

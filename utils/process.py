@@ -13,9 +13,8 @@ def process_file(filename: str,
                  language_tool_checker: LanguageToolChecker,
                  formatting_checker: FormattingChecker,
                  outputter: BaseOutput,
-                 command_exclusions: List[str],
                  word_exclusions: List[str]) -> str:
-    quoted_texts, line_positions = extract_text(filename, command_exclusions)
+    quoted_texts, line_positions = extract_text(filename)
     batches = create_batches(quoted_texts, line_positions)
 
     output_buffer = []

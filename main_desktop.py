@@ -73,7 +73,7 @@ class RenpyTextLinterApp(QMainWindow):
         }.get(output_type, InAppOutput())
 
         # TODO: добавить возможность подгрузки исключений для десктоп-версии
-        command_exclusions, word_exclusions = [], []
+        word_exclusions = []
 
         try:
             yaspeller_checker = YaSpellerChecker(
@@ -87,7 +87,7 @@ class RenpyTextLinterApp(QMainWindow):
                 language_tool_checker,
                 formatting_checker,
                 outputter,
-                command_exclusions, word_exclusions
+                word_exclusions
             )
 
             if output_type == constants.OutputType.IN_APP.value:
