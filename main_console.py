@@ -19,7 +19,7 @@ def main():
         "paths",
         metavar="PATH",
         type=str,
-        nargs="+",
+        nargs=1,
         help="Файлы или директории для проверки орфографии"
     )
     parser.add_argument(
@@ -49,7 +49,7 @@ def main():
     }.get(args.output_type, ConsoleOutput())
 
     files = []
-    for path in args.paths:
+    for path in args.paths[0].split():
         p = pathlib.Path(path)
         if p.is_dir():
             for file in p.rglob("*.rpy"):
